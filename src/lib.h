@@ -76,8 +76,9 @@ void printSensor()
     if (millis() - millise1 > 200 && detected == false)
     {
       detected = true;
-      Serial.println("detected");
+      Serial.println("{ \"ultrasonik\" : true }");
     }
+    delay(100);
   }
   else if (sonar.ping_cm() > 100)
   {
@@ -85,13 +86,16 @@ void printSensor()
     if (millis() - millise2 > 1500 && detected == true)
     {
       detected = false;
-      Serial.println("not detected");
+      Serial.println("{ \"ultrasonik\" : false }");
     }
+    delay(100);
   }
 }
 
 void modbusRelay1(int _state, unsigned int _ord)
 {
+  unsigned long millisee = millis();
+  bool bole = false;
 
   while (1)
   {
@@ -112,16 +116,20 @@ void modbusRelay1(int _state, unsigned int _ord)
       int len = Serial2.readBytes(buffer, 8);
       if (buffer[0] != 0)
       {
+        Serial.println("{ \"relay\" : " + (String)_ord + ", \"status\" : " + (_state ? "ON" : "OFF") + " }");
         break;
       }
+    }
+    if (millis() - millisee > 5000 && bole == false)
+    {
+      bole = true;
+      Serial.println("{ \"relay\" : " + (String)_ord + ", \"status\" : Wait }");
     }
   }
 }
 void printping()
 {
-  Serial.println("ping");
-  Serial.print("Jarak: ");
-  Serial.println(sonar.ping_cm());
+  Serial.println("{ \"jarak\" : " + (String)sonar.ping_cm() + ", \"status\" : true }");
 }
 // void modbusRelay2(int _state, unsigned int _ord){
 //   if(_state == 0){

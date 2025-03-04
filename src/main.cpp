@@ -1,17 +1,20 @@
 #include "lib.h"
+#include <errOTA.h>
 
 // NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 void setup()
 {
   Serial.begin(9600);
   setup2();
+  setupOTA();
   modbusSetup();
 }
 
 void loop()
 {
+  server.handleClient();
+  ElegantOTA.loop();
   printSensor();
-  delay(100);
   if (Serial.available())
   {
     int intbuf1 = -1;
@@ -40,7 +43,7 @@ void loop()
       if (bufer[i] == 41)
       {
         modbusRelay1(intbuf1, intbuf2);
-        Serial.println("(" + String(intbuf1) + "," + String(intbuf2) + ")");
+        // Serial.println("(" + String(intbuf1) + "," + String(intbuf2) + ")");
       }
     }
   }
